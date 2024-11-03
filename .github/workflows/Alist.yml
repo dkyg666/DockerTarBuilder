@@ -32,14 +32,12 @@ jobs:
 
     - name: Get filenames in current directory
       run: |
-        filenames=$(ls *.tar 2>/dev/null | tr '\n' ',')
-        filenames="${filenames%,}"
-        echo "FILENAMES=${filenames}" >> $GITHUB_ENV
+       echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ')" >> $GITHUB_ENV
 
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-       name: ${{ env.FILENAMES }}
+       name: my-artifacts
        path: ${{ env.FILENAMES }}
        retention-days: 1  # 将保留天数设置为 1 天
 
