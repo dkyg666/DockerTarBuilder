@@ -44,7 +44,7 @@ jobs:
       id: create_release
       uses: ncipollo/release-action@v1
       with:
-        tag: ${{ format('{0:yyyy-MM-dd}', github.run_started_at) }}  
+        tag: "release-${{ github.run_id }}"
         name: ${{ env.FILENAMES }}
         files: '*.tar'
 
