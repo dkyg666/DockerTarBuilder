@@ -39,7 +39,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-       name: my-artifacts
+       name: ${{ env.FILENAMES }}
        path: ${{ env.FILENAMES }}
        retention-days: 1  # 将保留天数设置为 1 天
 
