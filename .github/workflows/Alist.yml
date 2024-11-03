@@ -46,7 +46,7 @@ jobs:
       with:
         tag: "release-${{ github.run_id }}"
         name: ${{ env.FILENAMES }}
-        artifact: '*.tar'
+        artifacts: '*.tar'
 
     - name: Clean up intermediate files
       run: |
