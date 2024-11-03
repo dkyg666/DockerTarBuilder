@@ -30,12 +30,16 @@ jobs:
         done
 
 
-    - name: Upload artifacts
+    - name: Get filenames in current directory
       run: |
-       for file in *.tar; do
-        echo "Uploading ${file}"
-        actions/upload-artifact@v4 --name "$(basename "${file}")" --path "${file}"
-       done
+       echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ')" >> $GITHUB_ENV
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifacts
+        path: ${{ env.FILENAMES }}
+        retention-days: 1  # 将保留天数设置为 1 天
 
     - name: Clean up intermediate files
       run: |
