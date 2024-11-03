@@ -32,7 +32,7 @@ jobs:
 
     - name: Get filenames in current directory
       run: |
-       echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ')" >> $GITHUB_ENV
+       echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ' | sed 's/ $//')" >> $GITHUB_ENV
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
