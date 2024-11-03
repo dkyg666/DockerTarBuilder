@@ -28,7 +28,10 @@ jobs:
           docker pull "${image}" --platform "linux/amd64"
           docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/-/g')-amd64.tar"
         done
-
+        
+    - name: Set Release Date
+      id: set_date
+      run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
     - name: Get filenames in current directory
       run: |
@@ -44,8 +47,8 @@ jobs:
       id: create_release
       uses: ncipollo/release-action@v1
       with:
-        tag: "release-${{ github.run_id }}"
-        name: ${{ env.FILENAMES }}
+        tag: "release-${{ env.RELEASE_DATE }}-${{ github.run_id }}"
+        name: "${{ env.RELEASE_DATE }}: ${{ env.FILENAMES }}"
         artifacts: '*.tar'
 
     - name: Clean up intermediate files
