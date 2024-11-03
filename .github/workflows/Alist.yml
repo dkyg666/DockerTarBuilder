@@ -26,7 +26,7 @@ jobs:
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
           docker pull "${image}" --platform "linux/amd64"
-          docker save "${image}" -o "${image//\//_}-amd64.tar"
+          docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/_/g')-amd64.tar"
         done
 
 
