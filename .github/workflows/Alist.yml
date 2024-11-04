@@ -43,14 +43,12 @@ jobs:
       run: |
        echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ' | sed 's/ $//')" >> $GITHUB_ENV
 
-    - name: Create release
-      id: create_md5
+    - name: Prepare MD5 content
+      id: prepare_md5
       run: |
-         md5_contents=""
-         for file in *.tar.md5; do
-         md5_contents+="$(cat "$file")\n"  # 读取每个 MD5 文件的内容
-         done
-         echo "MD5_CONTENTS=$md5_contents" >>
+          echo "MD5_CONTENTS<<EOF" >> $GITHUB_ENV
+          cat *-amd64.tar.md5 >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
