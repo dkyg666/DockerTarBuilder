@@ -28,7 +28,13 @@ jobs:
           docker pull "${image}" --platform "linux/amd64"
           docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/-/g')-amd64.tar"
         done
-        
+
+    - name: Generate MD5 checksums
+      run: |
+          for file in *.tar; do
+            md5sum "$file" >> "${file}.md5"
+          done 
+          
     - name: Set Release Date
       id: set_date
       run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
