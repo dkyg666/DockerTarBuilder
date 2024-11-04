@@ -66,8 +66,8 @@ jobs:
         name: "${{ env.RELEASE_DATE }}: ${{ env.FILENAMES }}"
         body: ${{ env.MD5_CONTENTS }}
         artifacts: |
-                *.tar
-                *.md5
+                   *.tar
+                   *.md5
                 
 
     - name: Clean up intermediate files
