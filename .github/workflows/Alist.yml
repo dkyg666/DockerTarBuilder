@@ -35,6 +35,9 @@ jobs:
             md5sum "$file" >> "${file}.md5"
           done 
           
+    - name: Compress the TAR files
+      run: tar -czf "${{ env.FILENAMES }}.gz" *.tar *.md5
+      
     - name: Set Release Date
       id: set_date
       run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
@@ -68,6 +71,7 @@ jobs:
         artifacts: |
                    *.tar
                    *.md5
+                   *.gz
                 
 
     - name: Clean up intermediate files
