@@ -65,7 +65,7 @@ jobs:
         tag: "release-${{ env.RELEASE_DATE }}-${{ github.run_id }}"
         name: "${{ env.RELEASE_DATE }}: ${{ env.FILENAMES }}"
         body: ${{ env.MD5_CONTENTS }}
-        artifacts: ${{ env.FILENAMES }}
+        artifacts: '*.tar'
                 
 
     - name: Clean up intermediate files
