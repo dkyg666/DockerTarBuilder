@@ -1,4 +1,4 @@
-name: Alist_docker_amd64
+name: Alist_docker_arm64
 on:
   workflow_dispatch:
     inputs:
@@ -25,8 +25,8 @@ jobs:
         images="${{ github.event.inputs.docker_images }}"
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
-          docker pull "${image}" --platform "linux/amd64"
-          docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/-/g')-amd64.tar"
+          docker pull "${image}" --platform "linux/arm64"
+          docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/-/g')-arm64.tar"
         done
 
     - name: Generate MD5 checksums
@@ -52,7 +52,7 @@ jobs:
       id: prepare_md5
       run: |
           echo "MD5_CONTENTS<<EOF" >> $GITHUB_ENV
-          cat *-amd64.tar.md5 >> $GITHUB_ENV
+          cat *-arm64.tar.md5 >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
     
     - name: Upload artifacts
@@ -76,4 +76,4 @@ jobs:
 
     - name: Clean up intermediate files
       run: |
-        rm *-amd64.tar
+        rm *-arm64.tar
