@@ -53,7 +53,7 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.FILENAMES }}
+        name: dockerimages
         path: |
               *.tar
               *.md5
@@ -65,7 +65,7 @@ jobs:
         tag: "release-${{ env.RELEASE_DATE }}-${{ github.run_id }}"
         name: "${{ env.RELEASE_DATE }}: ${{ env.FILENAMES }}"
         body: "MD5$:{{ env.MD5_CONTENTS }}"
-        artifacts: ${{ env.FILENAMES }}
+        artifacts: dockerimages
                 
 
     - name: Clean up intermediate files
