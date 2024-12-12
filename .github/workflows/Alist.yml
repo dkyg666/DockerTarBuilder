@@ -68,7 +68,7 @@ jobs:
       id: create_release
       uses: ncipollo/release-action@v1
       with:
-        tag: "${{ env.RELEASE_DATE }}-${{ github.run_id }}"
+        tag: "release-${{ env.RELEASE_DATE }}-${{ github.run_id }}"
         name: "${{ env.RELEASE_DATE }}: ${{ env.FILENAMES }}"
         body: ${{ env.MD5_CONTENTS }}
         artifacts: |
