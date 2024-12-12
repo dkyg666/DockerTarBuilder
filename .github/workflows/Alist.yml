@@ -47,7 +47,7 @@ jobs:
       
     - name: Set Release Date
       id: set_date
-      run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      run: echo "RELEASE_DATE=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
 
 
 
