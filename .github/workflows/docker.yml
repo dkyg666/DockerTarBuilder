@@ -75,27 +75,7 @@ jobs:
                    *.tar
                    *.md5
                    *.gz
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3          
-    - name: Login to GHCR
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v6
-      with:
-        context: .
-        push: true
-        platforms: linux/amd64, linux/arm64/v8, linux/arm/v7, linux/arm/v6, linux/386
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-
+    
     - name: Clean up intermediate files
       run: |
         rm *-amd64.tar
