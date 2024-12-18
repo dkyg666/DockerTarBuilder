@@ -1,0 +1,82 @@
+name: docker
+on:
+  workflow_dispatch:
+    inputs:
+      docker_images:
+        description: '请填写docker镜像名称 多个用英文逗号分开'
+        required: true
+        default: 'xhofe/alist:latest'  # 设置默认的 Docker 镜像列表
+
+jobs:
+  pull_and_package:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Clean up Docker to free space
+      run: |
+          docker system prune -a -f
+          docker volume prune -f
+
+    - name: Pull Docker Images and Package
+      run: |
+        images="${{ github.event.inputs.docker_images }}"
+        IFS=',' read -r -a image_array <<< "$images"
+        for image in "${image_array[@]}"; do
+          docker pull "${image}" --platform "linux/amd64"
+          docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/-/g')-amd64.tar"
+        done
+
+    - name: Generate MD5 checksums
+      run: |
+          for file in *.tar; do
+            md5sum "$file" >> "${file}.md5"
+          done 
+          
+    - name: Get filenames in current directory
+      run: |
+       echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ' | sed 's/ $//')" >> $GITHUB_ENV    
+   
+    - name: Compress each TAR file separately
+      run: |
+        for file in *.tar; do
+          tar -czf "${file}.gz" "$file" "${file}.md5"
+        done
+      
+    - name: Set Release Date
+      id: set_date
+      run: echo "RELEASE_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+
+
+    - name: Prepare MD5 content
+      id: prepare_md5
+      run: |
+          echo "MD5_CONTENTS<<EOF" >> $GITHUB_ENV
+          cat *.tar.md5 >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dockerimages
+        path: '*.gz'
+        retention-days: 1  # 将保留天数设置为 1 天
+    - name: Create release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: "release-${{ env.RELEASE_DATE }}-${{ github.run_id }}"
+        name: "${{ env.RELEASE_DATE }}-${{ github.run_id }}: ${{ env.FILENAMES }}"
+        body: ${{ env.MD5_CONTENTS }}
+        artifacts: |
+                   *.tar
+                   *.md5
+                   *.gz
+                
+
+    - name: Clean up intermediate files
+      run: |
+        rm *-amd64.tar
