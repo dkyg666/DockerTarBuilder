@@ -22,28 +22,28 @@ jobs:
 
     - name: Pull Docker Images and Package
       run: |
-        images="${{ github.event.inputs.docker_images }}"
-        IFS=',' read -r -a image_array <<< "$images"
-        for image in "${image_array[@]}"; do
-          docker pull "${image}" --platform "linux/amd64"
-          docker save "${image}" -o "$(echo "${image}" | sed 's/[\/:]/-/g')-amd64.tar"
-        done
+          images="${{ github.event.inputs.docker_images }}"
+          IFS=',' read -r -a image_array <<< "$images"
+          for image in "${image_array[@]}"; do
+            docker pull "${image}" --platform "linux/amd64"
+            image_name="${image//\//_}"
+            image_name="${image_name//:/_}"
+            docker save "${image}" -o "${image_name}-amd64.tar"
+            gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
+            rm "${image_name}-amd64.tar"
+          done
 
     - name: Generate MD5 checksums
       run: |
-          for file in *.tar; do
+          for file in *.gz; do
             md5sum "$file" >> "${file}.md5"
           done 
           
     - name: Get filenames in current directory
       run: |
-       echo "FILENAMES=$(ls *.tar 2>/dev/null | tr '\n' ' ' | sed 's/ $//')" >> $GITHUB_ENV    
+       echo "FILENAMES=$(ls *.gz 2>/dev/null | tr '\n' ' ' | sed 's/ $//')" >> $GITHUB_ENV    
    
-    - name: Compress each TAR file separately
-      run: |
-        for file in *.tar; do
-          tar -czf "${file}.gz" "$file" "${file}.md5"
-        done
+  
       
     - name: Set Release Date
       id: set_date
@@ -55,7 +55,7 @@ jobs:
       id: prepare_md5
       run: |
           echo "MD5_CONTENTS<<EOF" >> $GITHUB_ENV
-          cat *.tar.md5 >> $GITHUB_ENV
+          cat *.md5 >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
     
     - name: Upload artifacts
@@ -72,11 +72,9 @@ jobs:
         name: "${{ env.RELEASE_DATE }}-${{ github.run_id }}: ${{ env.FILENAMES }}"
         body: ${{ env.MD5_CONTENTS }}
         artifacts: |
-                   *.tar
                    *.md5
                    *.gz
                 
-
     - name: Clean up intermediate files
       run: |
-        rm *-amd64.tar
+        rm *.gz
